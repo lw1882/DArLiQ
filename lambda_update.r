@@ -7,7 +7,7 @@ lambda_series <- function(theta, n, zVec) {
     for (i in 2:n) {
         lamVec[i] <- 1-theta[1]-theta[2]+theta[1]*lamVec[i-1]+theta[2]*zVec[i-1]
     } 
-   
+    
     return(lamVec)
 }
 ### ======================================================================== ###

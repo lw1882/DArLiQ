@@ -29,7 +29,7 @@ inequal <- function(theta, n, zVec) {
 }
 ### 1-step GMM estimation to obtain consistent estimates 
 resGMM <- solnp(pars=theta0[1:2], fun=Q_GMM, LB=c(0, 0), UB=c(1, 0.5),
-             ineqfun=inequal, ineqLB=0, ineqUB=1, n=n, zVec=zV)
+                ineqfun=inequal, ineqLB=0, ineqUB=1, n=n, zVec=zV)
 print(paste("The estimated parameters [beta, gamma] are:", 
             paste(round(resGMM$pars, 3), collapse = " ")))
 ### ======================================================================== ###
