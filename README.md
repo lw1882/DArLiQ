@@ -17,7 +17,5 @@ main_data.r: construct the illiquidity series.
 
 main_estimate.r: example to estimate the g function and the dynamic parameters via GMM/MLE.
 
-main_break.r: example to compute the test statistics of permanent and temporary breaks in the illiquidity at a stock split date.
-
 
 
