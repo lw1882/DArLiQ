@@ -61,3 +61,20 @@ cov_NW <- function(rho, lmax=5) {
 }
 ### ======================================================================== ###
 
+
+### ======================================================================== ###
+fgrad <- function(theta, n, zVec, retE) {
+    rho <- rho_GMM(theta=theta, n=n, zVec=zVec, retE=FALSE)
+    return(colMeans(rho))
+}
+stdError_GMM <- function(theta, n, zVec, lmax=10) {
+    dg <- numgrad(fgrad, theta, n=n, zVec=zVec, retE=FALSE)
+    rho <- rho_GMM(theta=theta, n=n, zVec=zVec, retE=FALSE)
+    Omega <- cov_NW(rho=rho, lmax=lmax)
+    WI <- diag(ncol(rho)) 
+    V  <- solve(t(dg) %*% WI %*% dg)
+    VMid <- t(dg) %*% WI %*% Omega %*% WI %*% dg
+    stdError <- sqrt(diag((V %*% VMid  %*% V)/n))
+}
+### ======================================================================== ###
+
