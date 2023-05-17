@@ -8,6 +8,7 @@ g_trend_LL_bwRoT <- function(tVec, lVec, ifTheta=FALSE, ifUpdate=FALSE,
     h <- bwRoT_DArLiq(tVec=tVec, lVec=lVec, ifUpdate=ifUpdate, 
                       sigmaZeta=sigmaZeta)    
     if (ifUpdate) {
+        print(round(h, 3))
         ll <- locpoly(x=tVec, y=lVec, bandwidth=h, degree=1,
                       gridsize=length(tVec))
         llTheta <- locpoly(x=tVec, y=lVec, bandwidth=h/2, degree=1,

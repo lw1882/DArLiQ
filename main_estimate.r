@@ -22,11 +22,11 @@ source("func_step2_lambda_MLE.r")
 ### ======================================================================== ###
 tVec <- (1:n)/n   # tVec=(1:n)/n
 # estimated trend function (Local Linear)
-gKS <- g_trend_LL_bwRoT(tVec=tVec, lVec=liquidity, ifTheta=FALSE, 
+gLL <- g_trend_LL_bwRoT(tVec=tVec, lVec=liquidity, ifTheta=FALSE, 
                         ifUpdate=FALSE, sigmaZeta=NA)
 ### ======================================================================== ###
 ### plot illiquidity series and the trend function
-liquidityTS <- as.xts(cbind(gKS$y, liquidity), 
+liquidityTS <- as.xts(cbind(gLL$y, liquidity), 
                       order.by=dates[2:(n+1)])
 colnames(liquidityTS) <- c("Trend", "Illiquidity")
 cols <- c("darkred", "darkblue")
@@ -51,7 +51,7 @@ gVectheta <- g_trend_LL_bwRoT(tVec=tVec, lVec=liquidity, ifTheta=TRUE,
                               ifUpdate=FALSE, sigmaZeta=NA)
 zVec <- liquidity/gVectheta$y   # l*: re-scaled illiquidity
 ### ======================================================================== ###
-theta0 <- c(0.9, 0.05, 1.3)
+theta0 <- c(0.95, 0.03, 1.3)
 inequal <- function(theta, n, zVec) {
     return(theta[1]+theta[2])
 }
@@ -73,12 +73,12 @@ lamVec <- lambda_series(theta=estGMM$pars, n=n, zVec=zVec)
 zetaVec <- zVec/lamVec
 ### ======================================================================== ###
 ### update based on the estimated lambda [work with lt/lambda]
-gVecthetaU <- g_trend_LL_bwRoT(tVec=tVec, lVec=liquidity, ifTheta=TRUE, 
+gVecthetaU <- g_trend_LL_bwRoT(tVec=tVec, lVec=liquidity/lamVec, ifTheta=TRUE, 
                                ifUpdate=TRUE, sigmaZeta=sd(zetaVec))
 zVecU <- liquidity/gVecthetaU$llTheta$y   # l*: re-scaled illiquidity
-estGMMU <- solnp(pars=theta0[1:2], fun=Q_GMM, LB=c(0, 0), UB=c(1, 0.5),
+estGMMU <- solnp(pars=estGMM$pars[1:2], fun=Q_GMM, LB=c(0, 0), UB=c(1, 0.5),
                  ineqfun=inequal, ineqLB=0, ineqUB=1, n=n, zVec=zVecU)
-estGMMU <- solnp(pars=theta0[1:2], fun=Q_GMM, LB=c(0, 0), UB=c(1, 0.5),
+estGMMU <- solnp(pars=estGMM$pars[1:2], fun=Q_GMM, LB=c(0, 0), UB=c(1, 0.5),
                  n=n, zVec=zVecU)
 print(paste("The estimated parameters [beta, gamma] are:", 
             paste(round(estGMMU$pars, 3), collapse = " ")))
