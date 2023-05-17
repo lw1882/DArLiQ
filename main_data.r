@@ -1,5 +1,6 @@
 ### ======================================================================== ###
 library("readr")
+# library("zoo")
 ### ======================================================================== ###
 
 
@@ -30,6 +31,7 @@ liquidity <- abs(returns)/volumesDollar[2:(n+1)]
 
 ### ======================================================================== ###
 ### zero observations in liquidity [due to zero returns]
+### most of the zeros are pre-2000; rounding issues [discussed in DArLiq]
 ### replace with average of near observations or a very small value [not optimal]
 while(sum(liquidity==0)>0) {
     # liquidity[liquidity==0] <- 1e-20

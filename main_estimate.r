@@ -3,13 +3,16 @@ rm(list=ls())
 ### ======================================================================== ###
 library("Rsolnp")
 library("xts")
+library("KernSmooth")
 ### ======================================================================== ###
 source("main_data.r")
-source("utils.r")
-source("g_trend_LL.r")
-source("lambda_update.r")
-source("lambda_GMM.r")
-source("lambda_MLE.r")
+source("func_utils.R")
+source("func_utils_lvar.R")
+source("func_step1_g_bandwidth.r")
+source("func_step1_g_trend.r")
+source("func_step2_lambda_update.r")
+source("func_step2_lambda_GMM.r")
+source("func_step2_lambda_MLE.r")
 ### ======================================================================== ###
 
 
@@ -18,7 +21,9 @@ source("lambda_MLE.r")
 ### Step 1: estimate long-run trend function g(t/T) -- local linear
 ### ======================================================================== ###
 tV <- (1:n)/n   # tVec=(1:n)/n
-gKS <- g_trend_LL(tVec=tV, lVec=liquidity)   # estimated trend function (LL)
+# estimated trend function (Local Linear)
+gKS <- g_trend_LL_bwRoT(tVec=tV, lVec=liquidity, ifTheta=FALSE, 
+                        ifUpdate=FALSE, sigmaZeta=NA)
 zV <- liquidity/gKS$y   # l*: re-scaled illiquidity
 ### ======================================================================== ###
 ### plot illiquidity series and the trend function
@@ -53,6 +58,8 @@ inequal <- function(theta, n, zVec) {
 ### 1-step GMM estimation to obtain consistent estimates
 estGMM <- solnp(pars=theta0[1:2], fun=Q_GMM, LB=c(0, 0), UB=c(1, 0.5),
                 ineqfun=inequal, ineqLB=0, ineqUB=1, n=n, zVec=zV)
+resGMM <- solnp(pars=theta0[1:2], fun=Q_GMM, LB=c(0, 0), UB=c(1, 0.5),
+                n=n, zVec=zV)
 print(paste("The estimated parameters [beta, gamma] are:", 
             paste(round(estGMM$pars, 3), collapse = " ")))
 fgrad <- function(theta, n, zVec, retE) {
@@ -66,15 +73,16 @@ WI <- diag(ncol(rho))
 V  <- solve(t(dg) %*% WI %*% dg)
 VMid <- t(dg) %*% WI %*% Omega %*% WI %*% dg
 cov <- (V %*% VMid  %*% V)/n
-se <- sqrt(diag(cov))
-tStats <- estGMM$pars/se
-print(paste("The t-statistics for the estimated parameters are:", 
-            paste(round(tStats, 3), collapse = " ")))
+stdError <- sqrt(diag(cov))
+print(paste("The standard errors for the estimated parameters are:", 
+            paste(round(stdError, 3), collapse = " ")))
 ### ======================================================================== ###
 ### MLE
 ### ======================================================================== ###
 res <- solnp(pars=theta0, fun=LL_Weibull, LB=c(0, 0, 0), UB=c(1, 0.5, 10), 
              ineqfun=inequal, ineqLB=0, ineqUB=1, n=n, zVec=zV)
+res <- solnp(pars=theta0, fun=LL_Weibull, LB=c(0, 0, 0), UB=c(1, 0.5, 10), 
+             n=n, zVec=zV)
 print(paste("The estimated parameters [beta, gamma, shape] are:", 
             paste(round(res$pars, 3), collapse = " ")))
 resEff <- MLE_Weibull_Eff(theta=res$pars[1:2], shape=res$pars[3], n=n, zVec=zV)
