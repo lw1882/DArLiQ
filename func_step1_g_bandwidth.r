@@ -2,6 +2,7 @@
 ### bandwidth selection using derived rule-of-thumb as derived in DArLiq
 ### ======================================================================== ###
 bwRoT_DArLiq <- function(tVec, lVec, ifUpdate=FALSE, sigmaZeta=NA) {
+    n <- length(tVec)
     ols_data <- data.frame(u=tVec, l=log(lVec))
     ols <- lm(l ~ u, data = ols_data) 
     a0 <- as.numeric(ols$coefficients[1])
