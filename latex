@@ -1,0 +1,22 @@
+\newcommand\marktopleftred[1]{%
+	\tikz[overlay,remember picture]
+	\node (marker-#1-a) at (.1em,.3em) {};%
+}
+\newcommand\markbottomrightred[1]{%
+	\tikz[overlay,remember picture]
+	\node (marker-#1-b) at (.1em,.3em) {};%
+	\tikz[overlay,remember picture,inner sep=3pt]
+	\node[draw=red,rounded corners,fit=(marker-#1-a.north west)
+	(marker-#1-b.south east)] {};%
+}
+\newcommand\marktopleftblue[1]{%
+	\tikz[overlay,remember picture]
+	\node (marker-#1-a) at (.1em,.3em) {};%
+}
+\newcommand\markbottomrightblue[1]{%
+	\tikz[overlay,remember picture]
+	\node (marker-#1-b) at (.1em,.3em) {};%
+	\tikz[overlay,remember picture,inner sep=3pt]
+	\node[draw=blue,rounded corners,fit=(marker-#1-a.north west)
+	(marker-#1-b.south east)] {};%
+}
